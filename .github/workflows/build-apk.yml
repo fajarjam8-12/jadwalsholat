@@ -1,0 +1,61 @@
+name: Build APK Android
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build web app
+        run: npm run build
+
+      - name: Tambah platform Android
+        run: npx cap add android
+
+      - name: Izin (lokasi, notifikasi, getar) di AndroidManifest
+        run: |
+          MANIFEST=android/app/src/main/AndroidManifest.xml
+          sed -i 's#</manifest>#    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n    <uses-permission android:name="android.permission.VIBRATE" />\n    <uses-feature android:name="android.hardware.location.gps" android:required="false" />\n</manifest>#' $MANIFEST
+
+      - name: Ikon aplikasi & sync
+        run: |
+          node scripts/make-icons.mjs
+          # pastikan tidak ada sisa referensi ikon yang rusak
+          rm -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher*.xml
+          mkdir -p android/app/src/main/res/mipmap-anydpi-v26
+          for n in ic_launcher ic_launcher_round; do
+            cat > android/app/src/main/res/mipmap-anydpi-v26/$n.xml <<'XML'
+          <?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+              <background android:drawable="@color/ic_launcher_background"/>
+              <foreground android:drawable="@mipmap/ic_launcher_foreground"/>
+          </adaptive-icon>
+          XML
+          done
+          npx cap sync android
+
+      - name: Build APK (debug, bisa langsung diinstal)
+        working-directory: android
+        run: ./gradlew assembleDebug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DemiWaktu-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
