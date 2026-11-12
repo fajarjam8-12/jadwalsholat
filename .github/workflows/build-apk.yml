@@ -21,10 +21,10 @@ jobs:
           java-version: 21
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deeps
+        run: npm install 
 
       - name: Build web app
-        run: npm run build
+        run: npm run build -legacy-peer-deps
 
       - name: Tambah platform Android
         run: npx cap add android
