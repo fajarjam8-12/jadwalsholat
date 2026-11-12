@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b" />
+      <stop offset="100%" stop-color="#022c22" />
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047" />
+      <stop offset="100%" stop-color="#eab308" />
+    </linearGradient>
+  </defs>
+  <!-- Background with squircle safe zone -->
+  <rect width="512" height="512" rx="110" fill="url(#bg)" />
+  <circle cx="256" cy="256" r="210" fill="none" stroke="#059669" stroke-width="4" stroke-opacity="0.3" stroke-dasharray="8 8" />
+  
+  <!-- Mosque Dome and Minaret Silhouette -->
+  <g transform="translate(64, 80)">
+    <!-- Crescent Moon & Star -->
+    <path d="M 192,20 A 45,45 0 0 0 236,75 A 40,40 0 1 1 180,22 A 45,45 0 0 0 192,20 Z" fill="url(#gold)" />
+    <polygon points="230,42 235,53 246,54 238,62 240,73 230,67 220,73 222,62 214,54 225,53" fill="url(#gold)" />
+    
+    <!-- Central Main Dome -->
+    <path d="M 100,260 C 100,160 160,110 192,90 C 224,110 284,160 284,260 Z" fill="#10b981" />
+    <!-- Mosque Arch / Gateway -->
+    <path d="M 152,260 L 152,190 C 152,165 170,145 192,145 C 214,145 232,165 232,190 L 232,260 Z" fill="#022c22" />
+    <circle cx="192" cy="180" r="10" fill="url(#gold)" />
+
+    <!-- Left Minaret -->
+    <rect x="52" y="140" width="30" height="120" rx="4" fill="#047857" />
+    <path d="M 46,140 L 67,95 L 88,140 Z" fill="url(#gold)" />
+    <rect x="62" y="80" width="10" height="15" fill="url(#gold)" />
+
+    <!-- Right Minaret -->
+    <rect x="302" y="140" width="30" height="120" rx="4" fill="#047857" />
+    <path d="M 296,140 L 317,95 L 338,140 Z" fill="url(#gold)" />
+    <rect x="312" y="80" width="10" height="15" fill="url(#gold)" />
+
+    <!-- Base foundation -->
+    <rect x="30" y="260" width="324" height="24" rx="6" fill="#047857" />
+  </g>
+</svg>

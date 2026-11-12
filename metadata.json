@@ -1,0 +1,10 @@
+{
+  "name": "Jadwal Sholat & Adzan Otomatis",
+  "description": "Aplikasi jadwal sholat presisi, pengingat adzan otomatis, kompas arah kiblat, dan doa harian yang ringan, cepat, dan ramah baterai.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

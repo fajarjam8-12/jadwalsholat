@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      (function() {
+        // 1. Intercept and suppress external Chrome Extension errors (e.g. requests.js / 200.js)
+        var isSuppressedError = function(msg, url, stack) {
+          var str = String(msg || '') + ' ' + String(url || '') + ' ' + String(stack || '');
+          return str.indexOf('chrome-extension://') !== -1 ||
+                 str.indexOf('Cannot set property fetch of #<Window>') !== -1 ||
+                 (str.indexOf('fetch') !== -1 && str.indexOf('has only a getter') !== -1);
+        };
+
+        window.addEventListener('error', function(event) {
+          var msg = event.message || '';
+          var url = event.filename || '';
+          var stack = (event.error && event.error.stack) ? event.error.stack : '';
+          if (isSuppressedError(msg, url, stack)) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            return true;
+          }
+        }, true);
+
+        window.addEventListener('unhandledrejection', function(event) {
+          var reason = event.reason;
+          var str = (reason && reason.stack) ? reason.stack : String(reason);
+          if (isSuppressedError(str, '', '')) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          }
+        }, true);
+
+        var prevOnError = window.onerror;
+        window.onerror = function(msg, url, line, col, error) {
+          var stack = error && error.stack ? error.stack : '';
+          if (isSuppressedError(msg, url, stack)) {
+            return true;
+          }
+          if (typeof prevOnError === 'function') {
+            return prevOnError.apply(this, arguments);
+          }
+          return false;
+        };
+
+        // 2. Define writable/configurable fetch setter so extensions that assign window.fetch succeed
+        try {
+          var _rawFetch = window.fetch ? window.fetch.bind(window) : null;
+          var _storedFetch = _rawFetch;
+
+          var applyProperty = function(target) {
+            if (!target) return;
+            try {
+              Object.defineProperty(target, 'fetch', {
+                configurable: true,
+                enumerable: true,
+                get: function() {
+                  return _storedFetch || _rawFetch;
+                },
+                set: function(val) {
+                  _storedFetch = val;
+                }
+              });
+            } catch (err) {
+              try {
+                target.fetch = function() {
+                  return (_storedFetch || _rawFetch).apply(this, arguments);
+                };
+              } catch (_) {}
+            }
+          };
+
+          applyProperty(window);
+          if (typeof Window !== 'undefined' && Window.prototype) {
+            applyProperty(Window.prototype);
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Demi Waktu - Pengingat Sholat & Amalan Istiqomah</title>
+    <meta name="description" content="Aplikasi Demi Waktu: jadwal sholat presisi, pengingat adzan otomatis, kalender Hijriah & Masehi, kompas kiblat, dan tracker amalan istiqomah yang ramah baterai." />
+    <meta property="og:title" content="Demi Waktu - Pengingat Sholat & Amalan Istiqomah" />
+    <meta property="og:description" content="Aplikasi Demi Waktu: jadwal sholat presisi, pengingat adzan otomatis, kalender Hijriah & Masehi, kompas kiblat, dan tracker amalan istiqomah yang ramah baterai." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#064e3b" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Demi Waktu" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <!-- Google Fonts: Plus Jakarta Sans for clean typography & Amiri for Arabic Quran/Dua -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-stone-950 text-stone-100 antialiased select-none font-sans overflow-x-hidden min-h-screen">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

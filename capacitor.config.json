@@ -1,0 +1,8 @@
+{
+  "appId": "id.demiwaktu.app",
+  "appName": "Demi Waktu",
+  "webDir": "dist",
+  "android": {
+    "allowMixedContent": false
+  }
+}
